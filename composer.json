@@ -15,10 +15,10 @@
     ],
     "autoload": {
         "psr-4": {
-            "TheRat\\CronControlBundle\\": "src/TheRat/CronControlBundle/"
+            "TheRat\\": "src/TheRat/"
         },
         "classmap": [
-            "app/CronControlApplication.php"
+            "app/AppKernel.php"
         ]
     },
     "require": {

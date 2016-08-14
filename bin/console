@@ -25,5 +25,6 @@ if (!$loaded) {
     );
     exit(1);
 }
-$application = new \TheRat\CronControl\Application();
+
+$application = new \TheRat\ConsoleApplication('cron-control', new AppKernel());
 $application->run();
