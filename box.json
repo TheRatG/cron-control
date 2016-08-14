@@ -1,0 +1,48 @@
+{
+    "directories": [
+        "src/"
+    ],
+    "extract": true,
+    "files": [
+        "README.md",
+        "config.yml",
+        "vendor/autoload.php",
+        "vendor/herrera-io/phar-update/res/schema.json"
+    ],
+    "finder": [
+        {
+            "name": [
+                "*.php",
+                "*.json",
+                "*.exe"
+            ],
+            "notPath": [
+                "phpunit/",
+                "phpdocumentor/",
+                "phpro/grumphp",
+                "squizlabs/php_codesniffer"
+            ],
+            "exclude": [
+                "phpunit",
+                "phpunit-test-case",
+                "Tester",
+                "Tests",
+                "tests",
+                "Test",
+                "test"
+            ],
+            "in": "vendor"
+        }
+    ],
+    "compactors": [
+        "Herrera\\Box\\Compactor\\Json",
+        "Herrera\\Box\\Compactor\\Php"
+    ],
+    "git-commit": "git-commit",
+    "git-version": "git-version",
+    "compression": "GZ",
+    "main": "bin/console",
+    "output": "cron-control.phar",
+    "stub": true,
+    "chmod": "0755"
+}

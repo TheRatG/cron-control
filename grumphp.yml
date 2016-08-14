@@ -1,0 +1,14 @@
+parameters:
+    git_dir: .
+    bin_dir: bin
+    tasks:
+        phpcs:
+            standard: "PSR2"
+        blacklist:
+            keywords:
+                - "die("
+                - "var_dump("
+                - "exit;"
+    ascii:
+        succeeded: ~
+        failed: ~

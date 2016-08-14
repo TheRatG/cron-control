@@ -1,0 +1,7 @@
+parameters:
+    therat.cron_control.config.class: \TheRat\CronControlBundle\Config
+
+services:
+    therat.cron_control.config:
+        class: '%therat.cron_control.config.class%'
+        arguments: [[]]
