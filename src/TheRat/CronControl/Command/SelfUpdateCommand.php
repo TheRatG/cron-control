@@ -1,5 +1,5 @@
 <?php
-namespace TheRat\CronControlBundle\Command;
+namespace TheRat\CronControl\Command;
 
 use Herrera\Phar\Update\Manager;
 use Herrera\Phar\Update\Manifest;
@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class SelfUpdateCommand
- * @package TheRat\CronControlBundle\Command
+ * @package TheRat\CronControl\Command
  */
 class SelfUpdateCommand extends AbstractCommand
 {

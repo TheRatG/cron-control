@@ -1,5 +1,5 @@
 <?php
-namespace TheRat\CronControlBundle\DependencyInjection;
+namespace TheRat\CronControl\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -25,6 +25,11 @@ class TheRatCronControlExtension extends Extension
         $loader->load('services.yml');
 
         $container->getDefinition('therat.cron_control.config')
-            ->addArgument($config);
+            ->setArguments([$config]);
+    }
+
+    public function getAlias()
+    {
+        return 'cron_control';
     }
 }

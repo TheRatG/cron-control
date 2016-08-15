@@ -1,11 +1,12 @@
 <?php
-namespace TheRat\CronControlBundle\Command;
+namespace TheRat\CronControl\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use TheRat\CronControl\Config;
 
 class DisableCommand extends AbstractCommand
 {
@@ -16,7 +17,7 @@ class DisableCommand extends AbstractCommand
                 'except',
                 'e',
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Do not disable files'
+                'Do not disable files preg match expression'
             )
             ->setDescription('Rename crontab files for disable');
     }
@@ -32,12 +33,12 @@ class DisableCommand extends AbstractCommand
         $symfonyStyle = new SymfonyStyle($input, $output);
 
         /** @var Config $config */
-        $config = $this->getHelper(ConfigHelper::class)->getConfig();
-        $helper = new RunHelper($config);
-        $jobs = $helper->generateJobs($config->getGlobPatterns());
-        if (count($jobs)) {
+        $config = $this->getContainer()->get('therat.cron_control.config');
+
+        $files = $config->getEnabledCrontabFiles();
+        if (count($files)) {
             $exceptList = $input->getOption('except');
-            foreach (array_keys($jobs) as $filename) {
+            foreach ($files as $filename) {
                 $except = $this->isInExceptionList($filename, $exceptList);
                 if ($except) {
                     $symfonyStyle->writeln(
@@ -49,6 +50,7 @@ class DisableCommand extends AbstractCommand
                 $newFilename = $filename.$config->getDisablePostfix();
                 $symfonyStyle->writeln(sprintf('%s -> %s', $filename, $newFilename));
                 if (!$input->getOption('dry-run')) {
+                    //todo check filetime
                     rename($filename, $newFilename);
                 }
             }

@@ -1,5 +1,5 @@
 parameters:
-    therat.cron_control.config.class: \TheRat\CronControlBundle\Config
+    therat.cron_control.config.class: \TheRat\CronControl\Config
 
 services:
     therat.cron_control.config:

@@ -2,7 +2,7 @@
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use TheRat\ConsoleKernel;
-use TheRat\CronControlBundle\DependencyInjection\TheRatCronControlExtension;
+use TheRat\CronControl\DependencyInjection\TheRatCronControlExtension;
 
 /**
  * Class AppKernel
@@ -20,10 +20,10 @@ class AppKernel extends ConsoleKernel
                 [
                     'src',
                     'TheRat',
-                    'CronControlBundle',
+                    'CronControl',
                     'Command'
                 ]
-            ) => 'TheRat\\CronControlBundle',
+            ) => 'TheRat\\CronControl',
         ];
     }
 

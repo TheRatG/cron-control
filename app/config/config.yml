@@ -1,0 +1,3 @@
+cron_control:
+    disable_postfix: '.disabled'
+    glob_patterns: ~

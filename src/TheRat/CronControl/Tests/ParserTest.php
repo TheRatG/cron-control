@@ -1,7 +1,7 @@
 <?php
-namespace TheRat\CronControlBundle\Tests;
+namespace TheRat\CronControl\Tests;
 
-use TheRat\CronControlBundle\Parser;
+use TheRat\CronControl\Parser;
 
 /**
  * Class ParserTest

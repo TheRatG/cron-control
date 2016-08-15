@@ -6,6 +6,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -186,18 +187,27 @@ abstract class ConsoleKernel
     protected function initializeContainer()
     {
         $container = $this->buildContainer();
+
         $container->compile();
+
+        $this->container = $container;
     }
 
     protected function buildContainer()
     {
         $containerBuilder = new ContainerBuilder();
 
+        $extensions = [];
         foreach ($this->registerExtension() as $extension) {
             $containerBuilder->registerExtension($extension);
+            $extensions[] = $extension->getAlias();
         }
 
+        // ensure these extensions are implicitly loaded
+        $containerBuilder->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions));
+
         $customConfigFilename = $this->getCustomConfigFilename();
+
         $paths = [$this->getRootDir()];
         if ($customConfigFilename) {
             $paths[] = dirname($customConfigFilename);
@@ -210,14 +220,16 @@ abstract class ConsoleKernel
             $loader->load(basename($customConfigFilename));
         }
 
+        $containerBuilder->set('kernel', $this);
+
         return $containerBuilder;
     }
 
-    protected function getCustomConfigFilename()
+    public function getCustomConfigFilename()
     {
         if (!$this->isBooted()) {
             $input = new ArgvInput();
-            $customConfigFilename = $input->getParameterOption(['--config', 't']);
+            $customConfigFilename = $input->getParameterOption(['--config', '-c']);
             if ($customConfigFilename) {
                 if (!$this->getFileSystem()->isAbsolutePath($customConfigFilename)) {
                     $customConfigFilename = getcwd().DIRECTORY_SEPARATOR.$customConfigFilename;

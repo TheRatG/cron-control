@@ -1,5 +1,5 @@
 <?php
-namespace TheRat\CronControlBundle\DependencyInjection;
+namespace TheRat\CronControl\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -18,6 +18,14 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('cron_control');
+
+        $rootNode
+            ->children()
+                ->scalarNode('disable_postfix')->cannotBeEmpty()->defaultValue('.disabled')->end()
+                ->arrayNode('glob_patterns')
+                    ->prototype('scalar')->end()
+                ->end()
+            ->end();
 
         return $treeBuilder;
     }

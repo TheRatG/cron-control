@@ -1,5 +1,5 @@
 <?php
-namespace TheRat\CronControlBundle\Command;
+namespace TheRat\CronControl\Command;
 
 class EnableCommand extends AbstractCommand
 {
