@@ -87,4 +87,33 @@ class ProcessModel extends AbstractModel
 
         return $result;
     }
+
+    public function buildContext()
+    {
+        $process = $this->getProcess();
+        $processOutput = $process->getOutput();
+        $processErrorOutput = $process->getErrorOutput();
+        $context = [
+            'crontab_filename' => $this->getFilename(),
+            'schedule' => $this->getJob()->getSchedule(),
+            'cmd' => $process->getCommandLine(),
+            'exit_code' => $process->getExitCode(),
+            'exit_code_text' => $process->getExitCode(),
+        ];
+        if ($processOutput) {
+            $context['output'] = $processOutput;
+        }
+        if ($processErrorOutput) {
+            $context['error_output'] = $processOutput;
+        }
+
+        return $context;
+    }
+
+    public function hasOutput()
+    {
+        $process = $this->getProcess();
+
+        return (!$process->isSuccessful() || $process->getOutput());
+    }
 }

@@ -5,7 +5,7 @@ class VariableModel extends AbstractModel
 {
     const NAME_MAIL = 'MAILTO';
 
-    const NAME_LOG_DIR = 'CRON_CONTROL_LOG_DIR';
+    const NAME_LOG_FILENAME = 'CRON_CONTROL_LOG_FILENAME';
 
     /**
      * @var string

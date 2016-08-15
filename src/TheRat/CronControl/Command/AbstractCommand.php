@@ -1,6 +1,7 @@
 <?php
 namespace TheRat\CronControl\Command;
 
+use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -10,6 +11,16 @@ use TheRat\CronControl\Config;
 abstract class AbstractCommand extends Command implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
+
+    /**
+     * @var Logger
+     */
+    protected $logger;
+
+    public function getLogger()
+    {
+        return $this->getConfig()->getLogger();
+    }
 
     /**
      * @return ContainerInterface

@@ -13,6 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ConsoleApplication extends Application
 {
     const INPUT_OPTION_CONFIG = 'config';
+
     /**
      * @var ConsoleKernel
      */

@@ -1,3 +1,13 @@
 cron_control:
     disable_postfix: '.disabled'
     glob_patterns: ~
+    log_filename: ./var/logs/output.log
+    mailer:
+        transport: mail
+        host: ~
+        port: 25
+        security: ~
+        username: ~
+        password: ~
+        sender_name: Cron Control
+        sender_email: ~

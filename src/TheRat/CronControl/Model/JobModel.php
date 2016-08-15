@@ -1,6 +1,9 @@
 <?php
 namespace TheRat\CronControl\Model;
 
+use Monolog\Handler\StreamHandler;
+use Symfony\Bridge\Monolog\Logger;
+
 class JobModel extends AbstractModel
 {
     /**
@@ -14,81 +17,74 @@ class JobModel extends AbstractModel
         'dayOfWeek' => '/[\*,\/\-0-9A-Z]+/',
         'command' => '/^(.)*$/',
     ];
-
     /**
      * @var string
      */
     protected $minute = '0';
-
     /**
      * @var string
      */
     protected $hour = '*';
-
     /**
      * @var string
      */
     protected $dayOfMonth = '*';
-
     /**
      * @var string
      */
     protected $month = '*';
-
     /**
      * @var string
      */
     protected $dayOfWeek = '*';
-
     /**
      * @var string
      */
     protected $command = null;
-
     /**
      * @var string
      */
     protected $comments = null;
-
     /**
      * @var string
      */
     protected $logFile = null;
-
     /**
      * @var string
      */
     protected $logSize = null;
-
     /**
      * @var string
      */
     protected $errorFile = null;
-
     /**
      * @var string
      */
     protected $errorSize = null;
-
     /**
      * @var \DateTime
      */
     protected $lastRunTime = null;
-
     /**
      * @var string
      */
     protected $status = 'unknown';
-
     /**
      * @var $hash
      */
     protected $hash = null;
-
     /**
      * @var string[]
      */
     protected $recipients = [];
+    /**
+     * @var string
+     */
+    protected $outputLogFilename;
+    /**
+     * @var Logger
+     */
+    private $logger;
 
     /**
      * Parse crontab line into self object
@@ -173,6 +169,49 @@ class JobModel extends AbstractModel
             ->setStatus($status);
 
         return $job;
+    }
+
+    /**
+     * @param string $defaultLogFilename
+     * @return Logger
+     */
+    public function buildLogger($defaultLogFilename)
+    {
+        $logger = new Logger(get_called_class());
+        $logFilename = $this->getOutputLogFilename() ?: $defaultLogFilename;
+        $logger->pushHandler(new StreamHandler($logFilename));
+
+        return $logger;
+    }
+
+    /**
+     * @param Logger $logger
+     * @return self
+     */
+    public function setLogger($logger)
+    {
+        $this->logger = $logger;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOutputLogFilename()
+    {
+        return $this->outputLogFilename;
+    }
+
+    /**
+     * @param string $outputLogFilename
+     * @return self
+     */
+    public function setOutputLogFilename($outputLogFilename)
+    {
+        $this->outputLogFilename = $outputLogFilename;
+
+        return $this;
     }
 
     /**

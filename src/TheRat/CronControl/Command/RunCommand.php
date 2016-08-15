@@ -6,9 +6,9 @@ use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
+use TheRat\CronControl\MailSender;
 use TheRat\CronControl\Model\ProcessModel;
 use TheRat\CronControl\Parser;
-use TheRat\LoggerTrait;
 
 /**
  * Class RunCommand
@@ -16,8 +16,6 @@ use TheRat\LoggerTrait;
  */
 class RunCommand extends AbstractCommand
 {
-    use LoggerTrait;
-
     protected function configure()
     {
         $this->setName('run')
@@ -52,35 +50,17 @@ class RunCommand extends AbstractCommand
                     );
                 }
 
-
                 if (!$process->isRunning()) {
-                    $this->getLogger()->debug(
-                        "Process stopped",
-                        ['crontab_filename' => $processModel->getFilename(), 'cmd' => $process->getCommandLine()]
-                    );
+                    if ($processModel->hasOutput()) {
+                        $this->getLogger()->error('Process stopped', $processModel->buildContext());
 
-                    if ($process->isSuccessful()) {
-                        $this->getLogger()->debug(
-                            'Output',
-                            [
-                                'crontab_filename' => $processModel->getFilename(),
-                                'cmd' => $process->getCommandLine(),
-                                'output' => $process->getOutput(),
-                            ]
-                        );
+                        $send = $this->sendEmail($processModel);
+                        if (!$send) {
+                            $this->getLogger()->warning('Email did not send');
+                        }
                     } else {
-                        $this->getLogger()->error(
-                            'Process error',
-                            [
-                                'crontab_filename' => $processModel->getFilename(),
-                                'cmd' => $process->getCommandLine(),
-                                'code' => $process->getExitCode(),
-                                'code_text' => $process->getExitCodeText(),
-                                'error' => $process->getErrorOutput(),
-                            ]
-                        );
+                        $this->getLogger()->debug('Process stopped', $processModel->buildContext());
                     }
-
                     unset($processModelList[$key]);
                 }
             }
@@ -128,5 +108,14 @@ class RunCommand extends AbstractCommand
         }
 
         return $result;
+    }
+
+    private function sendEmail(ProcessModel $processModel)
+    {
+        /** @var MailSender $mailSender */
+        $mailSender = $this->getContainer()->get('therat.cron_control.mail_sender');
+        $message = $mailSender->generateMessage($processModel);
+
+        return $mailSender->send($message);
     }
 }

@@ -22,8 +22,23 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('disable_postfix')->cannotBeEmpty()->defaultValue('.disabled')->end()
+                ->scalarNode('log_filename')->end()
                 ->arrayNode('glob_patterns')
                     ->prototype('scalar')->end()
+                ->end()
+                ->arrayNode('mailer')
+                    ->children()
+                        ->enumNode('transport')
+                            ->values(array('mail', 'smtp', ''))
+                        ->end()
+                        ->scalarNode('host')->end()
+                        ->integerNode('port')->defaultValue(25)->end()
+                        ->scalarNode('security')->end()
+                        ->scalarNode('username')->end()
+                        ->scalarNode('password')->end()
+                        ->scalarNode('sender_name')->defaultValue('Cron Control')->end()
+                        ->scalarNode('sender_email')->end()
+                    ->end()
                 ->end()
             ->end();
 

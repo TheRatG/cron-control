@@ -2,7 +2,7 @@
 
 Manage all your cron jobs without modifying crontab. Handles locking, logging, error emails, and more.
 
-## Features ##
+## Features
 
 - Maintain one master crontab job.
 - Jobs run via PHP, so you can run them under any programmatic conditions.
@@ -14,6 +14,6 @@ Manage all your cron jobs without modifying crontab. Handles locking, logging, e
 - Run by crontab file, there can be define logging, error email options
 - Find crontab files by regular expression, parse and run jobs
 
-## Credits ##
+## Credits
 
 Developed before by [jobby](<https://github.com/jobbyphp/jobby>).

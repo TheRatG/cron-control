@@ -58,14 +58,19 @@ class Parser
         $jobs = [];
 
         $elements = $this->parseString($input);
+        $logFilename = null;
+        $emails = [];
         foreach ($elements as $element) {
             if ($element instanceof VariableModel) {
-                if ($element->getName() === VariableModel::NAME_MAIL) {
-                    foreach (explode(',', $element->getValue()) as $email) {
-                        $emails[] = $email;
-                    }
-                } else {
-                    $variables[] = $element->getName().'='.$element->getValue();
+                switch ($element->getName()) {
+                    case VariableModel::NAME_MAIL:
+                        $emails += explode(',', $element->getValue());
+                        break;
+                    case VariableModel::NAME_LOG_FILENAME:
+                        $logFilename = $element->getValue();
+                        break;
+                    default:
+                        $variables[] = $element->getName().'='.$element->getValue();
                 }
             } elseif ($element instanceof JobModel) {
                 if (!array_key_exists($element->getHash(), $jobs)) {
@@ -84,6 +89,9 @@ class Parser
             }
             if ($emails) {
                 $job->setRecipients($job->getRecipients() + $emails);
+            }
+            if ($logFilename) {
+                $job->setOutputLogFilename($logFilename);
             }
             $result[$job->getHash()] = $job;
         }
