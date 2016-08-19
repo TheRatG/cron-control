@@ -1,6 +1,7 @@
 parameters:
     therat.cron_control.config.class: \TheRat\CronControl\Config
     therat.cron_control.mail_sender.class: \TheRat\CronControl\MailSender
+    therat.cron_control.service.processor.class: \TheRat\CronControl\Service\Processor
 
 services:
     therat.cron_control.config:
@@ -11,3 +12,9 @@ services:
         class: '%therat.cron_control.mail_sender.class%'
         arguments:
             - '@therat.cron_control.config'
+
+    therat.cron_control.service.processor:
+        class: '%therat.cron_control.service.processor.class%'
+        arguments:
+            - '@therat.cron_control.config'
+            - '@therat.cron_control.mail_sender'

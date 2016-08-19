@@ -178,6 +178,11 @@ class Config
         return $this->senderName ?: 'cron-control';
     }
 
+    public function getMaxRunningProcesses()
+    {
+        return 1000;
+    }
+
     private function buildMailer(array $config)
     {
         if ($config['transport'] == 'smtp') {

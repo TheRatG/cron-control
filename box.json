@@ -41,7 +41,7 @@
     "git-commit": "git-commit",
     "git-version": "git-version",
     "compression": "GZ",
-    "main": "bin/console",
+    "main": "bin/cron-control",
     "output": "cron-control.phar",
     "stub": true,
     "chmod": "0755"

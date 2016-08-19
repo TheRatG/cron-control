@@ -26,13 +26,13 @@ class ProcessModel extends AbstractModel
 
     /**
      * ProcessModel constructor.
-     * @param string   $filename
      * @param JobModel $job
+     * @param string   $filename
      */
-    public function __construct($filename, JobModel $job)
+    public function __construct(JobModel $job, $filename = 'without_crontab_file')
     {
-        $this->filename = $filename;
         $this->job = $job;
+        $this->filename = $filename;
     }
 
     /**
