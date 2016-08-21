@@ -29,16 +29,16 @@ class ProcessModelCollection extends ArrayCollection
         $processModel = new ProcessModel($job, $filename);
 
         $cron = CronExpression::factory($job->getSchedule());
-        if (!$cron->isDue()) {
+        if ($cron->isDue()) {
+            if (!empty($result[$processModel->getHash()])) {
+                throw new \RuntimeException('Found duplicate cron command: '.$processModel);
+            }
+
+            $this->set($processModel->getHash(), $processModel);
+            $this->getLogger()->info('Added job process', [(string)$processModel]);
+        } else {
             $this->getLogger()->debug('Skipped process by schedule', [(string)$processModel]);
         }
-
-        if (!empty($result[$processModel->getHash()])) {
-            throw new \RuntimeException('Found duplicate cron command: '.$processModel);
-        }
-
-        $this->set($processModel->getHash(), $processModel);
-        $this->getLogger()->debug('Added job process', [(string)$processModel]);
 
         return $this;
     }

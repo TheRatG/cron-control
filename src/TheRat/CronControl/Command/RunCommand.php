@@ -2,7 +2,9 @@
 namespace TheRat\CronControl\Command;
 
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\LockHandler;
@@ -14,10 +16,60 @@ use TheRat\CronControl\Service\Processor;
  */
 class RunCommand extends AbstractCommand
 {
+    /**
+     * @var bool
+     */
+    protected $shutdownRequested = false;
+
+    public function run(InputInterface $input, OutputInterface $output)
+    {
+        // Add the signal handler
+        if (function_exists('pcntl_signal')) {
+            // Enable ticks for fast signal processing
+            declare(ticks = 1);
+            pcntl_signal(SIGTERM, [$this, 'handleSignal']);
+            pcntl_signal(SIGINT, [$this, 'handleSignal']);
+        }
+
+        return parent::run($input, $output);
+    }
+
+    /**
+     * Handle process signals.
+     *
+     * @param int $signal The signal code to handle
+     */
+    public function handleSignal($signal)
+    {
+        switch ($signal) {
+            // Shutdown signals
+            case SIGTERM:
+            case SIGINT:
+                $this->shutdown();
+                break;
+        }
+    }
+
+    /**
+     * Instruct the command to end the endless loop gracefully.
+     *
+     * This will finish the current iteration and give the command a chance
+     * to cleanup.
+     *
+     * @return Command The current instance
+     */
+    public function shutdown()
+    {
+        $this->shutdownRequested = true;
+
+        return $this;
+    }
+
     protected function configure()
     {
         $this->setName('run')
-            ->setDescription('Collect crontab tasks and run it');
+            ->setDescription('Collect crontab tasks and run it')
+            ->addOption('run-once', 'o', InputOption::VALUE_NONE, 'Run the command once, usefull for debugging');
     }
 
     /**
@@ -44,7 +96,13 @@ class RunCommand extends AbstractCommand
             /** @var Processor $processor */
             $processor = $this->getContainer()->get('therat.cron_control.service.processor');
             $processor->setLogger($this->getLogger());
+            $processor->getProcessModelCollection()->setLogger($this->getLogger());
 
+            if ($this->shutdownRequested) {
+                $processor->shutdown();
+            }
+
+            $once = $input->getOption('run-once');
             do {
                 $timeStart = microtime(true);
 
@@ -65,7 +123,11 @@ class RunCommand extends AbstractCommand
                         sleep($sleep);
                     }
                 }
-            } while ($processor->count() > 0);
+                if ($this->shutdownRequested) {
+                    break;
+                }
+                $nextIteration = $processor->count() > 0 && !$once && !$this->shutdownRequested;
+            } while ($nextIteration);
         } else {
             $this->getLogger()->debug('The command is already running in another process.');
         }

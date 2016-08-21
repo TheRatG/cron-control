@@ -26,6 +26,10 @@ class Processor
      * @var Config
      */
     protected $config;
+    /**
+     * @var bool
+     */
+    protected $shutdownRequested = false;
 
     public function __construct(Config $config, MailSender $mailSender)
     {
@@ -71,7 +75,11 @@ class Processor
                         $this->getLogger()->debug('Process stopped', $processModel->buildContext());
                     }
                     $this->getProcessModelCollection()->remove($key);
+                } elseif ($this->shutdownRequested) {
+                    $process->stop();
+                    $this->getLogger()->debug('Process stopped, shutdown requested', $processModel->buildContext());
                 }
+
             }
         } while ($this->getProcessModelCollection()->count() > 0);
     }
@@ -87,6 +95,13 @@ class Processor
     public function getProcessModelCollection()
     {
         return $this->processModelCollection;
+    }
+
+    public function shutdown()
+    {
+        $this->shutdownRequested = true;
+
+        return $this;
     }
 
     /**
