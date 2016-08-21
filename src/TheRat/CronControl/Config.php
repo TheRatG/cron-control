@@ -73,7 +73,7 @@ class Config
     public function getLogger()
     {
         if (null === $this->logger) {
-            $this->logger = new Logger(get_called_class());
+            $this->logger = new Logger('MAIN');
             if ($this->getLogFilename()) {
                 $this->logger->pushHandler(new StreamHandler($this->getLogFilename()));
             } else {

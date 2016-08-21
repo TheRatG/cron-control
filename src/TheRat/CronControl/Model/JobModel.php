@@ -177,8 +177,8 @@ class JobModel extends AbstractModel
      */
     public function buildLogger($defaultLogFilename)
     {
-        $logger = new Logger(get_called_class());
         $logFilename = $this->getOutputLogFilename() ?: $defaultLogFilename;
+        $logger = new Logger('CHILD');
         $logger->pushHandler(new StreamHandler($logFilename));
 
         return $logger;

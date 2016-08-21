@@ -55,9 +55,14 @@ class MailSender
         $mail->setFrom([$config->getSenderEmail() => $config->getSenderName()]);
         $mail->setSender($config->getSenderEmail());
 
-        $processModel->getJob()
-            ->buildLogger($this->getConfig()->getLogFilename())
-            ->error($subject, $processModel->buildContext());
+        $logger =
+            $processModel->getJob()
+                ->buildLogger($this->getConfig()->getLogFilename());
+        if ($process->isSuccessful()) {
+            $logger->notice($subject, $processModel->buildContext());
+        } else {
+            $logger->error($subject, $processModel->buildContext());
+        }
 
         return $mail;
     }

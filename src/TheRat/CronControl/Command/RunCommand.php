@@ -118,7 +118,7 @@ class RunCommand extends AbstractCommand
                     $processor->run();
 
                     $duration = microtime(true) - $timeStart;
-                    if ($duration < $period) {
+                    if ($duration < $period && !$once) {
                         $sleep = intval($period - $duration);
                         $this->getLogger()->debug('Sleep...', ['sec' => $sleep]);
                         sleep($sleep);
