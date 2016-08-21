@@ -42,6 +42,11 @@ class Config
     protected $logFilename;
 
     /**
+     * @var
+     */
+    protected $logLevel;
+
+    /**
      * @var Logger
      */
     private $logger;
@@ -57,6 +62,8 @@ class Config
         $this->mailer = $this->buildMailer($config['mailer']);
         $this->senderName = $config['mailer']['sender_name'];
         $this->senderEmail = $config['mailer']['sender_email'];
+        $this->logFilename = $config['logger']['filename'];
+        $this->logLevel = $config['logger']['level'];
     }
 
     /**
@@ -75,7 +82,7 @@ class Config
         if (null === $this->logger) {
             $this->logger = new Logger('MAIN');
             if ($this->getLogFilename()) {
-                $this->logger->pushHandler(new StreamHandler($this->getLogFilename()));
+                $this->logger->pushHandler(new StreamHandler($this->getLogFilename(), $this->getLogLevel()));
             } else {
                 $this->logger->pushHandler(new NullHandler());
             }
@@ -181,6 +188,14 @@ class Config
     public function getMaxRunningProcesses()
     {
         return 1000;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLogLevel()
+    {
+        return $this->logLevel;
     }
 
     private function buildMailer(array $config)

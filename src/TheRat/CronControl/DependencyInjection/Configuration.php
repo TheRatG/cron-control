@@ -22,7 +22,12 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('disable_postfix')->cannotBeEmpty()->defaultValue('.disabled')->end()
-                ->scalarNode('log_filename')->end()
+                ->arrayNode('logger')
+                    ->children()
+                        ->scalarNode('level')->cannotBeEmpty()->defaultValue('NOTICE')->end()
+                        ->scalarNode('filename')->end()
+                    ->end()
+                ->end()
                 ->arrayNode('glob_patterns')
                     ->prototype('scalar')->end()
                 ->end()

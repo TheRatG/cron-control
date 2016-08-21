@@ -65,14 +65,18 @@ class Processor
 
                 if (!$process->isRunning()) {
                     if ($processModel->hasOutput()) {
-                        $this->getLogger()->error('Process stopped', $processModel->buildContext());
+                        if ($process->isSuccessful()) {
+                            $this->getLogger()->notice('Process finished with output', $processModel->buildContext());
+                        } else {
+                            $this->getLogger()->error('Process finished with output', $processModel->buildContext());
+                        }
 
                         $send = $this->sendEmail($processModel);
                         if (!$send) {
                             $this->getLogger()->warning('Email did not send');
                         }
                     } else {
-                        $this->getLogger()->debug('Process stopped', $processModel->buildContext());
+                        $this->getLogger()->debug('Process finished', $processModel->buildContext());
                     }
                     $this->getProcessModelCollection()->remove($key);
                 } elseif ($this->shutdownRequested) {

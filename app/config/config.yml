@@ -1,7 +1,9 @@
 cron_control:
     disable_postfix: '.disabled'
     glob_patterns: ~
-    log_filename: ./var/logs/output.log
+    logger:
+        level: NOTICE
+        filename: ./var/logs/output.log
     mailer:
         transport: mail
         host: ~
