@@ -1,12 +1,14 @@
 <?php
 namespace TheRat\CronControl\Command;
 
+use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use TheRat\CronControl\Config;
+use TheRat\CronControl\Service\Switcher;
 
 class DisableCommand extends AbstractCommand
 {
@@ -30,47 +32,30 @@ class DisableCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $symfonyStyle = new SymfonyStyle($input, $output);
+        $this->getLogger()->pushHandler(new ConsoleHandler($output));
+        $this->getLogger()->debug(
+            'Start',
+            [
+                'command_name' => $this->getName(),
+                'args' => $input->getArguments(),
+                'opts' => $input->getOptions(),
+            ]
+        );
 
-        /** @var Config $config */
-        $config = $this->getContainer()->get('therat.cron_control.config');
+        /** @var Switcher $switcher */
+        $switcher = $this->getContainer()->get('therat.cron_control.service.switcher');
+        $switcher->setLogger($this->getLogger());
 
-        $files = $config->getEnabledCrontabFiles();
+        $files = $this->getConfig()->getEnabledCrontabFiles();
         if (count($files)) {
-            $exceptList = $input->getOption('except');
-            foreach ($files as $filename) {
-                $except = $this->isInExceptionList($filename, $exceptList);
-                if ($except) {
-                    $symfonyStyle->writeln(
-                        sprintf('Skipped disable "%s", because except "%s"', $filename, $except)
-                    );
-                    continue;
-                }
-
-                $newFilename = $filename.$config->getDisablePostfix();
-                $symfonyStyle->writeln(sprintf('%s -> %s', $filename, $newFilename));
-                if (!$input->getOption('dry-run')) {
-                    //todo check filetime
-                    rename($filename, $newFilename);
-                }
-            }
+            $exceptions = $input->getOption('except');
+            $switcher->disableFiles($files, $exceptions, $input->getOption('dry-run'));
         } else {
-            $symfonyStyle->writeln('Files not found');
-        }
-    }
-
-    protected function isInExceptionList($filename, array $exceptList)
-    {
-        $result = false;
-        if (!empty($exceptList)) {
-            foreach ($exceptList as $except) {
-                if (preg_match('#'.preg_quote($except, '#').'#', $filename)) {
-                    $result = $except;
-                    break;
-                }
-            }
+            $this->getLogger()->debug('Files not found');
         }
 
-        return $result;
+        $this->getLogger()->debug('Finish', ['command_name' => $this->getName()]);
+
+        return 0;
     }
 }
