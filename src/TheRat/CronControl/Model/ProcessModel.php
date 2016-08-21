@@ -98,7 +98,7 @@ class ProcessModel extends AbstractModel
             'schedule' => $this->getJob()->getSchedule(),
             'cmd' => $process->getCommandLine(),
             'exit_code' => $process->getExitCode(),
-            'exit_code_text' => $process->getExitCode(),
+            'exit_code_text' => $process->getExitCodeText(),
         ];
         if ($processOutput) {
             $context['output'] = $processOutput;

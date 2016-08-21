@@ -41,6 +41,7 @@ class RunCommand extends AbstractCommand
      */
     public function handleSignal($signal)
     {
+        $this->getLogger()->debug('Handle signal', [$signal]);
         switch ($signal) {
             // Shutdown signals
             case SIGTERM:
@@ -123,15 +124,17 @@ class RunCommand extends AbstractCommand
                         sleep($sleep);
                     }
                 }
+
                 if ($this->shutdownRequested) {
                     break;
                 }
-                $nextIteration = $processor->count() > 0 && !$once && !$this->shutdownRequested;
+                $nextIteration = !$once && !$this->shutdownRequested;
             } while ($nextIteration);
         } else {
             $this->getLogger()->debug('The command is already running in another process.');
         }
 
+        $lock->release();
         $this->getLogger()->debug('Finish', ['command_name' => $this->getName()]);
 
         return 0;
