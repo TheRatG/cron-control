@@ -46,29 +46,9 @@ class JobModel extends AbstractModel
      */
     protected $comments = null;
     /**
-     * @var string
-     */
-    protected $logFile = null;
-    /**
-     * @var string
-     */
-    protected $logSize = null;
-    /**
-     * @var string
-     */
-    protected $errorFile = null;
-    /**
-     * @var string
-     */
-    protected $errorSize = null;
-    /**
      * @var \DateTime
      */
     protected $lastRunTime = null;
-    /**
-     * @var string
-     */
-    protected $status = 'unknown';
     /**
      * @var $hash
      */
@@ -115,41 +95,7 @@ class JobModel extends AbstractModel
             list($command, $comment) = explode('#', $command);
             $comments = trim($comment);
         }
-
-        // extract error file
-        if (strpos($command, '2>>')) {
-            list($command, $errorFile) = explode('2>>', $command);
-            $errorFile = trim($errorFile);
-        }
-
-        // extract log file
-        if (strpos($command, '>>')) {
-            list($command, $logPart) = explode('>>', $command);
-            $logPart = explode(' ', trim($logPart));
-            $logFile = trim($logPart[0]);
-        }
-
-        // compute last run time, and file size
-        if (isset($logFile) && file_exists($logFile)) {
-            $lastRunTime = filemtime($logFile);
-            $logSize = filesize($logFile);
-        }
-        if (isset($errorFile) && file_exists($errorFile)) {
-            $lastRunTime = max($lastRunTime ?: 0, filemtime($errorFile));
-            $errorSize = filesize($errorFile);
-        }
-
         $command = trim($command);
-
-        // compute status
-        $status = 'error';
-        if ($logSize === null && $errorSize === null) {
-            $status = 'unknown';
-        } else {
-            if ($errorSize === null || $errorSize == 0) {
-                $status = 'success';
-            }
-        }
 
         // set the self object
         $job = new self();
@@ -160,13 +106,8 @@ class JobModel extends AbstractModel
             ->setMonth($parts[3])
             ->setDayOfWeek($parts[4])
             ->setCommand($command)
-            ->setErrorFile($errorFile)
-            ->setErrorSize($errorSize)
-            ->setLogFile($logFile)
-            ->setLogSize($logSize)
             ->setComments($comments)
-            ->setLastRunTime($lastRunTime)
-            ->setStatus($status);
+            ->setLastRunTime($lastRunTime);
 
         return $job;
     }
@@ -402,30 +343,6 @@ class JobModel extends AbstractModel
     }
 
     /**
-     * Return the status
-     *
-     * @return string
-     */
-    public function getStatus()
-    {
-        return $this->status;
-    }
-
-    /**
-     * Set the status
-     *
-     * @param string $status
-     *
-     * @return self
-     */
-    public function setStatus($status)
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-
-    /**
      * Return the comments
      *
      * @return string
@@ -449,102 +366,6 @@ class JobModel extends AbstractModel
         }
 
         $this->comments = $comments;
-
-        return $this;
-    }
-
-    /**
-     * Return error file
-     *
-     * @return string
-     */
-    public function getErrorFile()
-    {
-        return $this->errorFile;
-    }
-
-    /**
-     * Set the error file
-     *
-     * @param string $errorFile
-     *
-     * @return self
-     */
-    public function setErrorFile($errorFile)
-    {
-        $this->errorFile = $errorFile;
-
-        return $this->generateHash();
-    }
-
-    /**
-     * Return the error file size
-     *
-     * @return string
-     */
-    public function getErrorSize()
-    {
-        return $this->errorSize;
-    }
-
-    /**
-     * Set the error file size
-     *
-     * @param string $errorSize
-     *
-     * @return self
-     */
-    public function setErrorSize($errorSize)
-    {
-        $this->errorSize = $errorSize;
-
-        return $this;
-    }
-
-    /**
-     * Return log file
-     *
-     * @return string
-     */
-    public function getLogFile()
-    {
-        return $this->logFile;
-    }
-
-    /**
-     * Set the log file
-     *
-     * @param string $logFile
-     *
-     * @return self
-     */
-    public function setLogFile($logFile)
-    {
-        $this->logFile = $logFile;
-
-        return $this->generateHash();
-    }
-
-    /**
-     * Return the log file size
-     *
-     * @return string
-     */
-    public function getLogSize()
-    {
-        return $this->logSize;
-    }
-
-    /**
-     * Set the log file size
-     *
-     * @param string $logSize
-     *
-     * @return self
-     */
-    public function setLogSize($logSize)
-    {
-        $this->logSize = $logSize;
 
         return $this;
     }
@@ -591,8 +412,6 @@ class JobModel extends AbstractModel
             $this->getMonth(),
             $this->getDayOfWeek(),
             $this->getCommand(),
-            $this->prepareLog(),
-            $this->prepareError(),
             $this->prepareComments(),
         ];
     }
@@ -646,66 +465,6 @@ class JobModel extends AbstractModel
     }
 
     /**
-     * Prepare log
-     *
-     * @return string or null
-     */
-    public function prepareLog()
-    {
-        if (null !== $this->getLogFile()) {
-            return '>> '.$this->getLogFile();
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Prepare log
-     *
-     * @return string or null
-     */
-    public function prepareError()
-    {
-        if (null !== $this->getErrorFile()) {
-            return '2>> '.$this->getErrorFile();
-        } else {
-            if ($this->prepareLog()) {
-                return '2>&1';
-            } else {
-                return null;
-            }
-        }
-    }
-
-    /**
-     * Return the error file content
-     *
-     * @return string
-     */
-    public function getErrorContent()
-    {
-        if ($this->getErrorFile() && file_exists($this->getErrorFile())) {
-            return file_get_contents($this->getErrorFile());
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Return the log file content
-     *
-     * @return string
-     */
-    public function getLogContent()
-    {
-        if ($this->getLogFile() && file_exists($this->getLogFile())) {
-            return file_get_contents($this->getLogFile());
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * Return the last job run time
      *
      * @return \DateTime|null
@@ -744,7 +503,6 @@ class JobModel extends AbstractModel
                 strval($this->getMonth()),
                 strval($this->getDayOfWeek()),
                 strval($this->getCommand()),
-                strval($this->getErrorFile()),
             ]
         );
 
