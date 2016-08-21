@@ -2,6 +2,6 @@ cron_control:
     disable_postfix: '.disabled'
     logger:
         level: DEBUG
-        filename: ./var/logs/output.log
+        filename: /tmp/cron-control.log
     glob_patterns:
         - './etc/crontab.conf'

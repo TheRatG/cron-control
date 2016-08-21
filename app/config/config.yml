@@ -3,7 +3,7 @@ cron_control:
     glob_patterns: ~
     logger:
         level: NOTICE
-        filename: ./var/logs/output.log
+        filename: /tmp/cron-control.log
     mailer:
         transport: mail
         host: ~
