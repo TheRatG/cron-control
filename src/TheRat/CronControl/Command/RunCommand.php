@@ -16,6 +16,7 @@ use TheRat\CronControl\Service\Processor;
  */
 class RunCommand extends AbstractCommand
 {
+    const OPTION_NAME_ONCE = 'once';
     /**
      * @var bool
      */
@@ -70,11 +71,17 @@ class RunCommand extends AbstractCommand
     {
         $this->setName('run')
             ->setDescription('Collect crontab tasks and run it')
-            ->addOption('run-once', 'o', InputOption::VALUE_NONE, 'Run the command once, usefull for debugging');
+            ->addOption(
+                self::OPTION_NAME_ONCE,
+                'o',
+                InputOption::VALUE_NONE,
+                'Run the command once, usefull for debugging'
+            );
+        $this->addDryRunOption();
     }
 
     /**
-     * @param InputInterface         $input
+     * @param InputInterface $input
      * @param OutputInterface|Output $output
      *
      * @return int|null|void
@@ -90,6 +97,7 @@ class RunCommand extends AbstractCommand
                 'opts' => $input->getOptions(),
             ]
         );
+        $this->checkCustomConfigFile($input, $output);
         $period = 60;
 
         $lock = new LockHandler($this->getName());
@@ -103,7 +111,7 @@ class RunCommand extends AbstractCommand
                 $processor->shutdown();
             }
 
-            $once = $input->getOption('run-once');
+            $once = $input->getOption(self::OPTION_NAME_ONCE);
             do {
                 $timeStart = microtime(true);
 

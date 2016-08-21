@@ -20,6 +20,7 @@ class EnableCommand extends AbstractCommand
                 'Do not disable files preg match expression'
             )
             ->setDescription('Rename crontab files for enable');
+        $this->addDryRunOption();
     }
 
     /**
@@ -39,6 +40,7 @@ class EnableCommand extends AbstractCommand
                 'opts' => $input->getOptions(),
             ]
         );
+        $this->checkCustomConfigFile($input, $output);
 
         /** @var Switcher $switcher */
         $switcher = $this->getContainer()->get('therat.cron_control.service.switcher');

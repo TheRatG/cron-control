@@ -6,8 +6,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use TheRat\CronControl\Config;
 use TheRat\CronControl\Service\Switcher;
 
 class DisableCommand extends AbstractCommand
@@ -22,6 +20,7 @@ class DisableCommand extends AbstractCommand
                 'Do not disable files preg match expression'
             )
             ->setDescription('Rename crontab files for disable');
+        $this->addDryRunOption();
     }
 
     /**
@@ -41,6 +40,7 @@ class DisableCommand extends AbstractCommand
                 'opts' => $input->getOptions(),
             ]
         );
+        $this->checkCustomConfigFile($input, $output);
 
         /** @var Switcher $switcher */
         $switcher = $this->getContainer()->get('therat.cron_control.service.switcher');

@@ -28,6 +28,8 @@ class ShowCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->checkCustomConfigFile($input, $output);
+
         $symfonyStyle = new SymfonyStyle($input, $output);
 
         /** @var Config $config */
