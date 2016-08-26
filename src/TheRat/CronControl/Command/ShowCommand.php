@@ -49,7 +49,6 @@ class ShowCommand extends AbstractCommand
         $symfonyStyle->section('Glob patterns');
         $symfonyStyle->listing($config->getGlobPatterns());
 
-
         $enabledCrontabFiles = $config->getEnabledCrontabFiles();
         $symfonyStyle->section('Enabled crontab');
         $this->show($symfonyStyle, $enabledCrontabFiles, $full);

@@ -49,11 +49,6 @@ class ConsoleApplication extends Application
         return parent::doRun($input, $output);
     }
 
-    public function getCustomConfigFilename()
-    {
-        return sprintf('~/.%s.yml', $this->getName());
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -67,7 +62,7 @@ class ConsoleApplication extends Application
                 'c',
                 InputOption::VALUE_OPTIONAL,
                 'Config filename',
-                $this->getCustomConfigFilename()
+                $this->getKernel()->getHomeConfigFilename()
             )
         );
 

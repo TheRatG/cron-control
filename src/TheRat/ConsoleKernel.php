@@ -26,6 +26,11 @@ abstract class ConsoleKernel
     /**
      * @var string
      */
+    protected $name;
+
+    /**
+     * @var string
+     */
     protected $rootDir;
 
     /**
@@ -43,13 +48,38 @@ abstract class ConsoleKernel
      */
     protected $customConfigFilename;
 
-    public function __construct()
+    public function __construct($name)
     {
         if (!class_exists('Symfony\Component\Finder\Finder')) {
             throw new \RuntimeException('You need the symfony/finder component to register bundle commands.');
         }
 
+        $this->name = $name;
         $this->fileSystem = new Filesystem();
+    }
+
+    public static function homeDir()
+    {
+        // Cannot use $_SERVER superglobal since that's empty during UnitUnishTestCase
+        // getenv('HOME') isn't set on Windows and generates a Notice.
+        $home = getenv('HOME');
+        if (!empty($home)) {
+            // home should never end with a trailing slash.
+            $home = rtrim($home, '/');
+        } elseif (!empty($_SERVER['HOMEDRIVE']) && !empty($_SERVER['HOMEPATH'])) {
+            // home on windows
+            $home = $_SERVER['HOMEDRIVE'].$_SERVER['HOMEPATH'];
+            // If HOMEPATH is a root directory the path can end with a slash. Make sure
+            // that doesn't happen.
+            $home = rtrim($home, '\\/');
+        }
+
+        if (empty($home) && function_exists('posix_getpwuid')) {
+            $data = posix_getpwuid(posix_getuid());
+            $home = $data['dir'];
+        }
+
+        return empty($home) ? null : $home;
     }
 
     /**
@@ -64,7 +94,6 @@ abstract class ConsoleKernel
      * @return string[]
      */
     abstract public function registerCommandDirectories();
-
 
     /**
      * Loads the container configuration.
@@ -141,6 +170,42 @@ abstract class ConsoleKernel
         return dirname($this->getAppDir());
     }
 
+    public function getCustomConfigFilename()
+    {
+        if (!$this->isBooted()) {
+            $input = new ArgvInput();
+            $customConfigFilename = $input->getParameterOption(['--config', '-c']);
+            if (!file_exists($customConfigFilename)) {
+                if ($customConfigFilename && !$this->getFileSystem()->isAbsolutePath($customConfigFilename)) {
+                    $customConfigFilename = getcwd().DIRECTORY_SEPARATOR.$customConfigFilename;
+                    if (file_exists($customConfigFilename)) {
+                        $this->customConfigFilename = $customConfigFilename;
+                    }
+                }
+                if (!$this->customConfigFilename) {
+                    $this->customConfigFilename = $this->getHomeConfigFilename();
+                }
+            } else {
+                $this->customConfigFilename = $customConfigFilename;
+            }
+        }
+
+        return $this->customConfigFilename;
+    }
+
+    public function getHomeConfigFilename()
+    {
+        return sprintf('%s/.%s.yml', self::homeDir(), $this->getName());
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
     protected function findCommands($dir, $namespace)
     {
         if (!is_dir($dir)) {
@@ -207,40 +272,22 @@ abstract class ConsoleKernel
         $containerBuilder->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions));
 
         $customConfigFilename = $this->getCustomConfigFilename();
+        $existsCustomConfigFilename = file_exists($customConfigFilename);
 
         $paths = [$this->getRootDir()];
-        if ($customConfigFilename) {
+        if ($existsCustomConfigFilename) {
             $paths[] = dirname($customConfigFilename);
         }
 
         $loader = new YamlFileLoader($containerBuilder, new FileLocator($paths));
         $this->registerContainerConfiguration($loader);
 
-        if ($customConfigFilename) {
+        if ($existsCustomConfigFilename) {
             $loader->load(basename($customConfigFilename));
         }
 
         $containerBuilder->set('kernel', $this);
 
         return $containerBuilder;
-    }
-
-    public function getCustomConfigFilename()
-    {
-        if (!$this->isBooted()) {
-            $input = new ArgvInput();
-            $customConfigFilename = $input->getParameterOption(['--config', '-c']);
-            if ($customConfigFilename) {
-                if (!$this->getFileSystem()->isAbsolutePath($customConfigFilename)) {
-                    $customConfigFilename = getcwd().DIRECTORY_SEPARATOR.$customConfigFilename;
-                }
-
-                if (file_exists($customConfigFilename)) {
-                    $this->customConfigFilename = $customConfigFilename;
-                }
-            }
-        }
-
-        return $this->customConfigFilename;
     }
 }

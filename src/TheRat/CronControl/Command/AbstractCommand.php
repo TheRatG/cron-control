@@ -14,7 +14,6 @@ use TheRat\CronControl\Config;
 abstract class AbstractCommand extends Command implements ContainerAwareInterface
 {
     const INPUT_OPTION_CONFIG = 'config';
-    const DEFAULT_CONFIG_FILENAME = '~/.cron-control.yml';
 
     use ContainerAwareTrait;
 
