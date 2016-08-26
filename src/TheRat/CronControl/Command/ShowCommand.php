@@ -40,12 +40,38 @@ class ShowCommand extends AbstractCommand
         /** @var ConsoleKernel $kernel */
         $kernel = $this->getContainer()->get('kernel');
         $customConfigFilename = $kernel->getCustomConfigFilename();
+        $full = $input->getOption('full');
 
-        $symfonyStyle->writeln('Custom config filename: '.($customConfigFilename ?: 'none'));
-        $symfonyStyle->newLine();
-        $symfonyStyle->table(['Glob patterns'], [$config->getGlobPatterns()]);
+        $symfonyStyle->writeln('Custom config filename: '.$customConfigFilename);
+        if ($full) {
+            $symfonyStyle->writeln(file_get_contents($customConfigFilename));
+        }
+        $symfonyStyle->section('Glob patterns');
+        $symfonyStyle->listing($config->getGlobPatterns());
 
-        $symfonyStyle->table(['Enabled crontab'], [$config->getEnabledCrontabFiles()]);
-        $symfonyStyle->table(['Disabled crontab'], [$config->getDisabledCrontabFiles()]);
+
+        $enabledCrontabFiles = $config->getEnabledCrontabFiles();
+        $symfonyStyle->section('Enabled crontab');
+        $this->show($symfonyStyle, $enabledCrontabFiles, $full);
+
+        $disabledCrontabFiles = $config->getDisabledCrontabFiles();
+        $symfonyStyle->section('Disabled crontab');
+        $this->show($symfonyStyle, $disabledCrontabFiles, $full);
+    }
+
+    protected function show(SymfonyStyle $symfonyStyle, array $files, $full = false)
+    {
+        if ($files) {
+            if ($full) {
+                foreach ($files as $file) {
+                    $symfonyStyle->section($file);
+                    $symfonyStyle->writeln(file_get_contents($file));
+                }
+            } else {
+                $symfonyStyle->listing($files);
+            }
+        } else {
+            $symfonyStyle->listing(['not found']);
+        }
     }
 }

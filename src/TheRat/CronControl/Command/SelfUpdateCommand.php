@@ -18,7 +18,7 @@ class SelfUpdateCommand extends AbstractCommand
     {
         $this
             ->setName('self-update')
-            ->setDescription('Updates geggs.phar to the latest version');
+            ->setDescription('Updates cron-control.phar to the latest version');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

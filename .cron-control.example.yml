@@ -4,4 +4,4 @@ cron_control:
         level: DEBUG
         filename: /tmp/cron-control.log
     glob_patterns:
-        - './etc/crontab.conf'
+        - './etc/crontab_*.conf'

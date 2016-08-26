@@ -56,6 +56,14 @@ abstract class AbstractCommand extends Command implements ContainerAwareInterfac
 
     protected function checkCustomConfigFile(InputInterface $input, OutputInterface $output)
     {
-        throw new \Exception('Method not implemented');
+        $customConfigFilename = $input->getOption('config');
+        if (!file_exists($customConfigFilename)) {
+            throw new \RuntimeException(
+                sprintf(
+                    'Config file not found "%s", you could use "init" command for creating config file.',
+                    $customConfigFilename
+                )
+            );
+        }
     }
 }

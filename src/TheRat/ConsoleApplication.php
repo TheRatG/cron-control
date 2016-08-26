@@ -70,9 +70,6 @@ class ConsoleApplication extends Application
                 $this->getCustomConfigFilename()
             )
         );
-        $definition->addOption(
-            new InputOption('dry-run', 't', InputOption::VALUE_NONE, 'Try operation but make no changes')
-        );
 
         return $definition;
     }
