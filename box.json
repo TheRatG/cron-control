@@ -5,7 +5,7 @@
     "extract": true,
     "files": [
         "README.md",
-        "config.yml",
+        "LICENSE",
         "vendor/autoload.php",
         "vendor/herrera-io/phar-update/res/schema.json"
     ],

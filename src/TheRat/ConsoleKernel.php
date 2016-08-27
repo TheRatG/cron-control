@@ -208,11 +208,16 @@ abstract class ConsoleKernel
 
     protected function findCommands($dir, $namespace)
     {
+        if (!$this->fileSystem->isAbsolutePath($dir)) {
+            $dir = $this->getRootDir().DIRECTORY_SEPARATOR.$dir;
+        }
+
         if (!is_dir($dir)) {
-            return [];
+            throw new \RuntimeException(sprintf('Command dir "%s" does not exists', $dir));
         }
 
         $finder = new Finder();
+
         $finder->files()->name('*Command.php')->in($dir);
 
         $prefix = $namespace.'\\Command';

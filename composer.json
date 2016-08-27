@@ -7,6 +7,7 @@
         "Symfony3",
         "crontab"
     ],
+    "homepage": "http://theratg.github.io/cron-control/",
     "authors": [
         {
             "name": "Vladimir Pak",

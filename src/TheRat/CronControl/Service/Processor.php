@@ -38,8 +38,9 @@ class Processor
         $this->processModelCollection = new ProcessModelCollection();
     }
 
-    public function run()
+    public function run($period)
     {
+        $timeStart = microtime(true);
         do {
             foreach ($this->getProcessModelCollection() as $key => $processModel) {
                 /** @var Process $process */
@@ -85,7 +86,15 @@ class Processor
                 }
 
             }
-        } while ($this->getProcessModelCollection()->count() > 0);
+
+            $next = false;
+            if (time_nanosleep(0, 500000000) === true) {
+                $next = true;
+            }
+            $next = $next && $this->getProcessModelCollection()->count() > 0;
+            $duration = microtime(true) - $timeStart;
+            $next = $next && $duration < $period;
+        } while ($next);
     }
 
     public function count()

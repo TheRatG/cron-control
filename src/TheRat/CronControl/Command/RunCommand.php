@@ -107,14 +107,8 @@ class RunCommand extends AbstractCommand
             $processor->setLogger($this->getLogger());
             $processor->getProcessModelCollection()->setLogger($this->getLogger());
 
-            if ($this->shutdownRequested) {
-                $processor->shutdown();
-            }
-
             $once = $input->getOption(self::OPTION_NAME_ONCE);
             do {
-                $timeStart = microtime(true);
-
                 $files = $this->getConfig()->getEnabledCrontabFiles();
                 $this->getLogger()->debug('Enabled crontab files', $files);
                 foreach ($files as $filename) {
@@ -123,20 +117,16 @@ class RunCommand extends AbstractCommand
                 $this->getLogger()->debug('Next iteration', ['jobs_count' => $processor->count()]);
 
                 if ($processor->count()) {
-                    $processor->run();
-
-                    $duration = microtime(true) - $timeStart;
-                    if ($duration < $period && !$once) {
-                        $sleep = intval($period - $duration);
-                        $this->getLogger()->debug('Sleep...', ['sec' => $sleep]);
-                        sleep($sleep);
-                    }
+                    $processor->run($period);
                 }
 
                 if ($this->shutdownRequested) {
+                    $processor->shutdown();
                     break;
                 }
                 $nextIteration = !$once && !$this->shutdownRequested;
+
+                $this->getLogger()->debug('Iteration complete');
             } while ($nextIteration);
         } else {
             $this->getLogger()->debug('The command is already running in another process.');

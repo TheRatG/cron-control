@@ -17,3 +17,16 @@ Manage all your cron jobs without modifying crontab. Handles locking, logging, e
 ## Credits
 
 Developed before by [jobby](<https://github.com/jobbyphp/jobby>).
+
+## Build new version of geggs
+
+* Create and push tag
+* Create phar 
+```
+ulimit -Sn 4096; box build --verbose
+```
+* Go to github and upload new `geggs.phar` into new release
+* Publish new manifest
+```
+manifest publish:gh-pages octava/geggs -vvv
+```
