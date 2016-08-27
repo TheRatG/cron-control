@@ -30,5 +30,5 @@ ulimit -Sn 4096; box build --verbose
 * Go to github and upload new `geggs.phar` into new release
 * Publish new manifest
 ```
-manifest publish:gh-pages octava/geggs -vvv
+manifest publish:gh-pages TheRatG/cron-control -vvv
 ```
