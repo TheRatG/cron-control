@@ -1,0 +1,6 @@
+{
+  "name": "Cron-control",
+  "tagline": "Manage all your cron jobs without modifying crontab. Handles locking, logging, error emails, and more.",
+  "body": "# cron-control, a PHP cron job manager\r\n\r\nManage all your cron jobs without modifying crontab. Handles locking, logging, error emails, and more.\r\n\r\n## Features\r\n\r\n- Maintain one master crontab job.\r\n- Jobs run via PHP, so you can run them under any programmatic conditions.\r\n- Use ordinary crontab schedule syntax (powered by the excellent [`cron-expression`](<https://github.com/mtdowling/cron-expression>)).\r\n- Run only one copy of a job at a given time (by default).\r\n- Send email whenever a job exits with an error status. \r\n- Run job as another user, if crontab user has `sudo` privileges.\r\n- Run only on certain hostnames (handy in webfarms).\r\n- Run by crontab file, there can be define logging, error email options\r\n- Find crontab files by regular expression, parse and run jobs\r\n\r\n## Credits\r\n\r\nDeveloped before by [jobby](<https://github.com/jobbyphp/jobby>).",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
