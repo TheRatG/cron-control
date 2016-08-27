@@ -40,7 +40,7 @@
         "Herrera\\Box\\Compactor\\Php"
     ],
     "git-commit": "git-commit",
-    "git-version": "git-version",
+    "git-version": "package_version",
     "compression": "GZ",
     "main": "bin/cron-control",
     "output": "cron-control.phar",
