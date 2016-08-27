@@ -1,5 +1,6 @@
 {
     "directories": [
+        "app/",
         "src/"
     ],
     "extract": true,

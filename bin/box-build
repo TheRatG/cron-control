@@ -1,0 +1,4 @@
+#!/usr/bin/env php
+<?php
+exec('composer install --no-dev');
+exec('ulimit -Sn 4096; box build --verbose');
