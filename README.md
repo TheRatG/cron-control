@@ -2,6 +2,8 @@
 
 Manage all your cron jobs without modifying crontab. Handles locking, logging, error emails, and more.
 
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/3b83066e-a1b5-48ad-8359-cc6f3a62aa34/big.png)](https://insight.sensiolabs.com/projects/3b83066e-a1b5-48ad-8359-cc6f3a62aa34)
+
 ## Features
 
 - Maintain one master crontab job.

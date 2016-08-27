@@ -61,10 +61,6 @@ class JobModel extends AbstractModel
      * @var string
      */
     protected $outputLogFilename;
-    /**
-     * @var Logger
-     */
-    private $logger;
 
     /**
      * Parse crontab line into self object
@@ -88,7 +84,7 @@ class JobModel extends AbstractModel
         $command = implode(' ', array_slice($parts, 5));
 
         // prepare variables
-        $lastRunTime = $logFile = $logSize = $errorFile = $errorSize = $comments = null;
+        $lastRunTime = $comments = null;
 
         // extract comment
         if (strpos($command, '#')) {
@@ -123,17 +119,6 @@ class JobModel extends AbstractModel
         $logger->pushHandler(new StreamHandler($logFilename));
 
         return $logger;
-    }
-
-    /**
-     * @param Logger $logger
-     * @return self
-     */
-    public function setLogger($logger)
-    {
-        $this->logger = $logger;
-
-        return $this;
     }
 
     /**
