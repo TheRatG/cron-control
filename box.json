@@ -21,6 +21,7 @@
                 "phpunit/",
                 "phpdocumentor/",
                 "phpro/grumphp",
+                "phpspec/prophecy",
                 "squizlabs/php_codesniffer"
             ],
             "exclude": [
