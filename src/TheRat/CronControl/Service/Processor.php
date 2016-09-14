@@ -47,7 +47,7 @@ class Processor
                 $process = $processModel->getProcess();
 
                 if (!$process->isStarted()) {
-                    if ($this->getProcessModelCollection()->count() <= $this->getConfig()->getMaxRunningProcesses()) {
+                    if ($this->count() <= $this->getConfig()->getMaxRunningProcesses()) {
                         $process->start();
                         $this->getLogger()->debug(
                             "Process starts",
@@ -91,10 +91,23 @@ class Processor
             if (time_nanosleep(0, 500000000) === true) {
                 $next = true;
             }
-            $next = $next && $this->getProcessModelCollection()->count() > 0;
+            $next = $next && $this->count() > 0;
             $duration = microtime(true) - $timeStart;
             $next = $next && $duration < $period;
+
+            $this->getLogger()->debug(
+                'Next iteration',
+                [
+                    'next' => $next,
+                    'process_count' => $this->count(),
+                    'time_start' => $timeStart,
+                    'duration' => $duration,
+                    'period' => $period,
+                ]
+            );
         } while ($next);
+
+        return $this->count();
     }
 
     public function count()

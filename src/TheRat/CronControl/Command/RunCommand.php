@@ -116,17 +116,21 @@ class RunCommand extends AbstractCommand
                 }
                 $this->getLogger()->debug('Next iteration', ['jobs_count' => $processor->count()]);
 
+                $runCount = 0;
                 if ($processor->count()) {
-                    $processor->run($period);
+                    $runCount = $processor->run($period);
                 }
 
                 if ($this->shutdownRequested) {
                     $processor->shutdown();
                     break;
                 }
-                $nextIteration = !$once && !$this->shutdownRequested;
+                $nextIteration = !$once && !$this->shutdownRequested && !$runCount;
 
-                $this->getLogger()->debug('Iteration complete');
+                $this->getLogger()->debug(
+                    'Iteration complete',
+                    ['once' => $once, 'shutdown_request' => $this->shutdownRequested, 'run_count' => $runCount]
+                );
             } while ($nextIteration);
         } else {
             $this->getLogger()->debug('The command is already running in another process.');
