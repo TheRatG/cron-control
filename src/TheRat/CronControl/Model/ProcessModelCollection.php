@@ -3,6 +3,7 @@ namespace TheRat\CronControl\Model;
 
 use Cron\CronExpression;
 use Doctrine\Common\Collections\ArrayCollection;
+use TheRat\CronControl\MailSender;
 use TheRat\CronControl\Parser;
 use TheRat\LoggerTrait;
 
@@ -14,6 +15,10 @@ class ProcessModelCollection extends ArrayCollection
 {
     use LoggerTrait;
 
+    /**
+     * @var MailSender
+     */
+    protected $mailSender;
     /**
      * @var Parser
      */
@@ -34,8 +39,16 @@ class ProcessModelCollection extends ArrayCollection
                 throw new \RuntimeException('Found duplicate cron command: '.$processModel);
             }
 
-            $this->set($processModel->getHash(), $processModel);
-            $this->getLogger()->info('Added job process', [(string)$processModel]);
+            if (!$this->containsKey($processModel->getHash())) {
+                $this->set($processModel->getHash(), $processModel);
+                $this->getLogger()->info('Added job process', [(string)$processModel]);
+            } else {
+                $this->getLogger()->error('Lock error, job still running', [(string)$processModel]);
+                if ($this->getMailSender()) {
+                    $message = $this->getMailSender()->generateMessage($processModel, 'Lock error, job still running');
+                    $this->getMailSender()->send($message);
+                }
+            }
         } else {
             $this->getLogger()->debug('Skipped process by schedule', [(string)$processModel]);
         }
@@ -58,6 +71,25 @@ class ProcessModelCollection extends ArrayCollection
         } else {
             $this->getLogger()->error(sprintf('Skipped file "%s", because is not readable', $filename));
         }
+    }
+
+    /**
+     * @return MailSender
+     */
+    protected function getMailSender()
+    {
+        return $this->mailSender;
+    }
+
+    /**
+     * @param MailSender $mailSender
+     * @return self
+     */
+    public function setMailSender($mailSender)
+    {
+        $this->mailSender = $mailSender;
+
+        return $this;
     }
 
     /**

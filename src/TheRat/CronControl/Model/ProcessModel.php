@@ -91,15 +91,18 @@ class ProcessModel extends AbstractModel
     public function buildContext()
     {
         $process = $this->getProcess();
-        $processOutput = $process->getOutput();
-        $processErrorOutput = $process->getErrorOutput();
+        $processOutput = $process->isStarted() ? $process->getOutput() : null;
+        $processErrorOutput = $process->isStarted() ? $process->getErrorOutput() : null;
         $context = [
             'crontab_filename' => $this->getFilename(),
             'schedule' => $this->getJob()->getSchedule(),
             'cmd' => $process->getCommandLine(),
-            'exit_code' => $process->getExitCode(),
-            'exit_code_text' => $process->getExitCodeText(),
         ];
+
+        if ($process->isStarted()) {
+            $context['exit_code'] = $process->getExitCode();
+            $context['exit_code_text'] = $process->getExitCodeText();
+        }
         if ($processOutput) {
             $context['output'] = $processOutput;
         }

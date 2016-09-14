@@ -36,6 +36,7 @@ class Processor
         $this->config = $config;
         $this->mailSender = $mailSender;
         $this->processModelCollection = new ProcessModelCollection();
+        $this->processModelCollection->setMailSender($mailSender);
     }
 
     public function run($period)
@@ -72,10 +73,7 @@ class Processor
                             $this->getLogger()->error('Process finished with output', $processModel->buildContext());
                         }
 
-                        $send = $this->sendEmail($processModel);
-                        if (!$send) {
-                            $this->getLogger()->warning('Email did not send');
-                        }
+                        $this->sendEmail($processModel);
                     } else {
                         $this->getLogger()->debug('Process finished', $processModel->buildContext());
                     }
@@ -83,8 +81,9 @@ class Processor
                 } elseif ($this->shutdownRequested) {
                     $process->stop();
                     $this->getLogger()->debug('Process stopped, shutdown requested', $processModel->buildContext());
+                } else {
+                    $this->getLogger()->debug('Process still running', $processModel->buildContext());
                 }
-
             }
 
             $next = false;
