@@ -5,7 +5,7 @@ use TheRat\CronControl\Parser;
 
 /**
  * Class ParserTest
- * @package RoboForex\CronControl\Tests
+ * @package TheRat\CronControl\Tests
  */
 class ParserTest extends \PHPUnit_Framework_TestCase
 {

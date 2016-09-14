@@ -20,6 +20,24 @@ Manage all your cron jobs without modifying crontab. Handles locking, logging, e
 
 Developed before by [jobby](<https://github.com/jobbyphp/jobby>).
 
+## Env variables
+
+There are two magic variables:
+
+- **MAILTO** - send command output to email
+- **CRON_CONTROL_LOG_FILENAME** - send command output to specific file
+
+Example
+```
+#my crontab file
+
+#send output to specific mail
+MAILTO=master@example.org
+ 
+#specific log filename
+CRON_CONTROL_LOG_FILENAME=/www/my_project/var/logs/master.log
+```
+
 ## Build new version of geggs
 
 * Create and push tag
