@@ -81,7 +81,7 @@ class RunCommand extends AbstractCommand
     }
 
     /**
-     * @param InputInterface $input
+     * @param InputInterface         $input
      * @param OutputInterface|Output $output
      *
      * @return int|null|void
@@ -100,7 +100,7 @@ class RunCommand extends AbstractCommand
         $this->checkCustomConfigFile($input, $output);
         $period = 60;
 
-        $lock = new LockHandler($this->getName());
+        $lock = new LockHandler(__FILE__);
         if ($lock->lock()) {
             /** @var Processor $processor */
             $processor = $this->getContainer()->get('therat.cron_control.service.processor');
