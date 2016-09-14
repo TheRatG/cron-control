@@ -125,7 +125,7 @@ class RunCommand extends AbstractCommand
                     $processor->shutdown();
                     break;
                 }
-                $nextIteration = !$once && !$this->shutdownRequested && !$runCount;
+                $nextIteration = !$once && !$this->shutdownRequested && $runCount;
 
                 $this->getLogger()->debug(
                     'Iteration complete',
