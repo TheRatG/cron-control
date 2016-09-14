@@ -50,3 +50,12 @@ ulimit -Sn 4096; box build --verbose
 ```
 manifest publish:gh-pages TheRatG/cron-control -vvv
 ```
+
+Flush manifest
+```
+git checkout gh-pages
+git rm manifest.json
+git commit
+git push
+rm -rf ~/.ManifestPublisher/*
+```
