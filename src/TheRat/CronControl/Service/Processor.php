@@ -75,7 +75,7 @@ class Processor
 
                         $this->sendEmail($processModel);
                     } else {
-                        $this->getLogger()->debug('Process finished', $processModel->buildContext());
+                        $this->getLogger()->info('Process finished', $processModel->buildContext());
                     }
                     $this->getProcessModelCollection()->remove($key);
                 } elseif ($this->shutdownRequested) {
