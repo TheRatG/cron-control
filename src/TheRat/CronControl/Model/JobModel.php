@@ -72,6 +72,7 @@ class JobModel extends AbstractModel
      */
     static public function parse($jobLine)
     {
+        $jobLine = preg_replace('/\s+/', ' ', $jobLine, 5);
         // split the line
         $parts = preg_split('@ @', $jobLine, null, PREG_SPLIT_NO_EMPTY);
 
