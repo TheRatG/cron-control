@@ -66,7 +66,18 @@ class ProcessModelCollection extends ArrayCollection
 
             $this->getLogger()->debug('Found jobs', [count($jobs)]);
             foreach ($jobs as $key => $job) {
-                $this->addJob($job, $filename);
+                try {
+                    $this->addJob($job, $filename);
+                } catch (\InvalidArgumentException $e) {
+                    $msg = sprintf(
+                        'error: "%s", job: "%s", filename: "%s"',
+                        $e->getMessage(),
+                        $job->__toString(),
+                        $filename
+                    );
+                    $this->getLogger()->error($e->getMessage(), ['job' => $job->__toString(), 'file' => $filename]);
+                    throw new \InvalidArgumentException($msg, 0, $e);
+                }
             }
         } else {
             $this->getLogger()->error(sprintf('Skipped file "%s", because is not readable', $filename));
