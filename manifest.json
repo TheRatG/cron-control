@@ -1,6 +1,12 @@
 [
     {
         "name": "cron-control.phar",
+        "sha1": "fe2e1dacfa03a89944d986b949251cd990830e4d",
+        "url": "https://github.com/TheRatG/cron-control/releases/download/2.0.5/cron-control.phar",
+        "version": "2.0.5"
+    },
+    {
+        "name": "cron-control.phar",
         "sha1": "49ca5343f7afca90dd883dc4108ba5cc95365c45",
         "url": "https://github.com/TheRatG/cron-control/releases/download/2.0.4/cron-control.phar",
         "version": "2.0.4"
